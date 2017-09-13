@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor.iOS.Xcode;
+using UnityModule.iOS.Xcode;
 
-namespace UnityEditor.iOS.Xcode.Tests
+namespace UnityModule.iOS.Xcode.Tests
 {
     [TestFixture]
     public class ProjectCapabilityManagerTests : GenericTester
@@ -11,13 +11,13 @@ namespace UnityEditor.iOS.Xcode.Tests
         public ProjectCapabilityManagerTests() : base("ProjectCapabilityManagerTestFiles", "ProjectCapabilityManagerTestOutput", false /*true for debug*/)
         {
         }
-        
+
         private static void ResetGuidGenerator()
         {
-            UnityEditor.iOS.Xcode.PBX.PBXGUID.SetGuidGenerator(LinearGuidGenerator.Generate);
+            UnityModule.iOS.Xcode.PBX.PBXGUID.SetGuidGenerator(LinearGuidGenerator.Generate);
             LinearGuidGenerator.Reset();
         }
-        
+
         private void TestOutputProject(PBXProject proj, string testFilename)
         {
             string sourceFile = Path.Combine(GetTestSourcePath(), testFilename);
@@ -47,7 +47,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             if (!DebugEnabled())
                 File.Delete(outputFile);
         }
-        
+
         private PBXProject ReadPBXProject()
         {
             return ReadPBXProject("base.pbxproj");

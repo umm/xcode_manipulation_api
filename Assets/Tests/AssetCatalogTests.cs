@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor.iOS.Xcode;
+using UnityModule.iOS.Xcode;
 
-namespace UnityEditor.iOS.Xcode.Tests
+namespace UnityModule.iOS.Xcode.Tests
 {
 
     [TestFixture]
@@ -266,4 +266,4 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
     }
 
-} // namespace UnityEditor.iOS.Xcode
+} // namespace UnityModule.iOS.Xcode

@@ -3,9 +3,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System;
-using UnityEditor.iOS.Xcode.PBX;
+using UnityModule.iOS.Xcode.PBX;
 
-namespace UnityEditor.iOS.Xcode.Extensions
+namespace UnityModule.iOS.Xcode.Extensions
 {
     /*  This class implements a number of static methods for performing common tasks
         on xcode projects. 
@@ -293,4 +293,4 @@ namespace UnityEditor.iOS.Xcode.Extensions
             return newTargetGuid;
         }
     }
-} // namespace UnityEditor.iOS.Xcode
+} // namespace UnityModule.iOS.Xcode

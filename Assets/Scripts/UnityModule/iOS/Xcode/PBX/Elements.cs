@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 
 
-namespace UnityEditor.iOS.Xcode.PBX
+namespace UnityModule.iOS.Xcode.PBX
 {
     
     class PBXElement
@@ -102,5 +102,5 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-} // namespace UnityEditor.iOS.Xcode
+} // namespace UnityModule.iOS.Xcode
 

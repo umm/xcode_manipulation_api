@@ -6,7 +6,7 @@ using System.Linq;
 using System;
 
 
-namespace UnityEditor.iOS.Xcode.PBX
+namespace UnityModule.iOS.Xcode.PBX
 {
     internal class PBXObjectData
     {   
@@ -990,5 +990,5 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-} // namespace UnityEditor.iOS.Xcode
+} // namespace UnityModule.iOS.Xcode
 

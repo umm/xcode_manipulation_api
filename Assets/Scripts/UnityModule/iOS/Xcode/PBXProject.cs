@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using UnityEditor.iOS.Xcode.PBX;
+using UnityModule.iOS.Xcode.PBX;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityModule.iOS.Xcode
 {
     using PBXBuildFileSection           = KnownSectionBase<PBXBuildFileData>;
     using PBXFileReferenceSection       = KnownSectionBase<PBXFileReferenceData>;
@@ -76,11 +75,11 @@ namespace UnityEditor.iOS.Xcode
         internal FileGUIDListBase BuildSectionAny(string sectionGuid) { return m_Data.BuildSectionAny(sectionGuid); }
 
         /// <summary>
-        /// Returns the path to PBX project in the given Unity build path. This function can only 
+        /// Returns the path to PBX project in the given Unity build path. This function can only
         /// be used in Unity-generated projects
         /// </summary>
         /// <param name="buildPath">The project build path</param>
-        /// <returns>The path to the PBX project file that can later be opened via ReadFromFile function</returns> 
+        /// <returns>The path to the PBX project file that can later be opened via ReadFromFile function</returns>
         public static string GetPBXProjectPath(string buildPath)
         {
             return PBXPath.Combine(buildPath, "Unity-iPhone.xcodeproj/project.pbxproj");
@@ -88,7 +87,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Returns the default main target name in Unity project.
-        /// The returned target name can then be used to retrieve the GUID of the target via TargetGuidByName 
+        /// The returned target name can then be used to retrieve the GUID of the target via TargetGuidByName
         /// function. This function can only be used in Unity-generated projects.
         /// </summary>
         /// <returns>The default main target name.</returns>
@@ -99,7 +98,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Returns the default test target name in Unity project.
-        /// The returned target name can then be used to retrieve the GUID of the target via TargetGuidByName 
+        /// The returned target name can then be used to retrieve the GUID of the target via TargetGuidByName
         /// function. This function can only be used in Unity-generated projects.
         /// </summary>
         /// <returns>The default test target name.</returns>
@@ -110,7 +109,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Returns the GUID of the project. The project GUID identifies a project-wide native target which
-        /// is used to set project-wide properties. This GUID can be passed to any functions that accepts 
+        /// is used to set project-wide properties. This GUID can be passed to any functions that accepts
         /// target GUIDs as parameters.
         /// </summary>
         /// <returns>The GUID of the project.</returns>
@@ -121,7 +120,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Returns the GUID of the native target with the given name.
-        /// In projects produced by Unity the main target can be retrieved via GetUnityTargetName function, 
+        /// In projects produced by Unity the main target can be retrieved via GetUnityTargetName function,
         /// whereas the test target name can be retrieved by GetUnityTestTargetName function.
         /// </summary>
         /// <returns>The name of the native target.</returns>
@@ -220,9 +219,9 @@ namespace UnityEditor.iOS.Xcode
         {
             PBXNativeTargetData target = nativeTargets[targetGuid];
             PBXFileReferenceData fileRef = FileRefsGet(fileGuid);
-            
+
             string ext = Path.GetExtension(fileRef.path);
- 
+
             if (FileTypeUtils.IsBuildable(ext, fileRef.isFolderReference) &&
                 BuildFilesGetForSourceFile(targetGuid, fileGuid) == null)
             {
@@ -234,8 +233,8 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Configures file for building for the given native target.
-        /// A projects containing multiple native targets, a single file or folder reference can be 
-        /// configured to be built in all, some or none of the targets. The file or folder reference is 
+        /// A projects containing multiple native targets, a single file or folder reference can be
+        /// configured to be built in all, some or none of the targets. The file or folder reference is
         /// added to appropriate build section depending on the file extension.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
@@ -248,8 +247,8 @@ namespace UnityEditor.iOS.Xcode
         /// <summary>
         /// Configures file for building for the given native target with specific compiler flags.
         /// The function is equivalent to [[AddFileToBuild()]] except that compile flags are specified.
-        /// A projects containing multiple native targets, a single file or folder reference can be 
-        /// configured to be built in all, some or none of the targets. The file or folder reference is 
+        /// A projects containing multiple native targets, a single file or folder reference can be
+        /// configured to be built in all, some or none of the targets. The file or folder reference is
         /// added to appropriate build section depending on the file extension.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
@@ -263,8 +262,8 @@ namespace UnityEditor.iOS.Xcode
         /// <summary>
         /// Configures file for building for the given native target on specific build section.
         /// The function is equivalent to [[AddFileToBuild()]] except that specific build section is specified.
-        /// A projects containing multiple native targets, a single file or folder reference can be 
-        /// configured to be built in all, some or none of the targets. The file or folder reference is 
+        /// A projects containing multiple native targets, a single file or folder reference can be
+        /// configured to be built in all, some or none of the targets. The file or folder reference is
         /// added to appropriate build section depending on the file extension.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
@@ -314,7 +313,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Adds an asset tag for the given file.
-        /// The asset tags identify resources that will be downloaded via On Demand Resources functionality. 
+        /// The asset tags identify resources that will be downloaded via On Demand Resources functionality.
         /// A request for specific tag will initiate download of all files, configured for that tag.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
@@ -371,7 +370,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Removes the asset tag from the list of tags to download during initial installation.
-        /// The function does nothing if the tag is not already configured for downloading during 
+        /// The function does nothing if the tag is not already configured for downloading during
         /// initial installation.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
@@ -384,7 +383,7 @@ namespace UnityEditor.iOS.Xcode
         /// <summary>
         /// Removes an asset tag.
         /// Removes the given asset tag from the list of configured asset tags for all files on all targets,
-        /// the list of asset tags configured for initial installation and the list of known asset tags in 
+        /// the list of asset tags configured for initial installation and the list of known asset tags in
         /// the Xcode project.
         /// </summary>
         /// <param name="tag">The name of the asset tag.</param>
@@ -444,19 +443,19 @@ namespace UnityEditor.iOS.Xcode
             var fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/" + framework, PBXSourceTree.Sdk);
             if (fileGuid == null)
                 return false;
- 
+
             var buildFile = BuildFilesGetForSourceFile(targetGuid, fileGuid);
             return (buildFile != null);
         }
 
         /// <summary>
         /// Adds a system framework dependency for the specified target.
-        /// The function assumes system frameworks are located in System/Library/Frameworks folder in the SDK source tree. 
+        /// The function assumes system frameworks are located in System/Library/Frameworks folder in the SDK source tree.
         /// The framework is added to Frameworks logical folder in the project.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         /// <param name="framework">The name of the framework. The extension of the filename must be ".framework".</param>
-        /// <param name="weak"><c>true</c> if the framework is optional (i.e. weakly linked) required, 
+        /// <param name="weak"><c>true</c> if the framework is optional (i.e. weakly linked) required,
         /// <c>false</c> if the framework is required.</param>
         public void AddFrameworkToProject(string targetGuid, string framework, bool weak)
         {
@@ -494,7 +493,7 @@ namespace UnityEditor.iOS.Xcode
             if (p.entitlementsFile != null && entitlementsFilePath != null && p.entitlementsFile != entitlementsFilePath)
             {
                 if (p.capabilities.Count > 0)
-                    throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : " + p.entitlementsFile);
+                    throw new Exception("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : " + p.entitlementsFile);
 
                 return false;
             }
@@ -502,7 +501,7 @@ namespace UnityEditor.iOS.Xcode
             // Add the capability only if it doesn't already exist.
             if (p.capabilities.Contains(new PBXCapabilityType.TargetCapabilityPair(targetGuid, capability)))
             {
-                throw new WarningException("This capability has already been added. Method ignored");
+                throw new Exception("This capability has already been added. Method ignored");
             }
 
             p.capabilities.Add(new PBXCapabilityType.TargetCapabilityPair(targetGuid, capability));
@@ -609,7 +608,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Removes the given file from project.
-        /// The file is removed from the list of files to build for each native target and also removed 
+        /// The file is removed from the list of files to build for each native target and also removed
         /// from the list of known files.
         /// </summary>
         /// <param name="fileGuid">The GUID of the file or folder reference.</param>
@@ -863,7 +862,7 @@ namespace UnityEditor.iOS.Xcode
         /// Creates a new native target.
         /// Target-specific build configurations are automatically created for each known build configuration name.
         /// Note, that this is a requirement that follows from the structure of Xcode projects, not an implementation
-        /// detail of this function. The function creates a product file reference in the "Products" project folder 
+        /// detail of this function. The function creates a product file reference in the "Products" project folder
         /// which refers to the target artifact that is built via this target.
         /// </summary>
         /// <returns>The GUID of the new target.</returns>
@@ -876,7 +875,7 @@ namespace UnityEditor.iOS.Xcode
         {
             var buildConfigList = XCConfigurationListData.Create();
             buildConfigLists.AddEntry(buildConfigList);
-            
+
             // create build file reference
             string fullName = name + "." + FileTypeUtils.TrimExtension(ext);
             var productFileRef = AddFile(fullName, "Products/" + fullName, PBXSourceTree.Build);
@@ -886,7 +885,7 @@ namespace UnityEditor.iOS.Xcode
 
             foreach (var buildConfigName in BuildConfigNames())
                 AddBuildConfigForTarget(newTarget.guid, buildConfigName);
-            
+
             return newTarget.guid;
         }
 
@@ -992,7 +991,7 @@ namespace UnityEditor.iOS.Xcode
         /// Creates a new set of build configurations for all targets in the project.
         /// The number and names of the build configurations is a project-wide setting. Each target has the
         /// same number of build configurations and the names of these build configurations is the same.
-        /// The created configurations are initially empty. Care must be taken to fill them with reasonable 
+        /// The created configurations are initially empty. Care must be taken to fill them with reasonable
         /// defaults.
         /// The function throws an exception if a build configuration with the given name already exists.
         /// </summary>
@@ -1013,7 +1012,7 @@ namespace UnityEditor.iOS.Xcode
         public void RemoveBuildConfig(string name)
         {
             foreach (var targetGuid in GetAllTargetGuids())
-                RemoveBuildConfigForTarget(targetGuid, name);   
+                RemoveBuildConfigForTarget(targetGuid, name);
         }
 
         /// <summary>
@@ -1076,7 +1075,7 @@ namespace UnityEditor.iOS.Xcode
             nativeTargets[targetGuid].phases.AddGUID(phase.guid);
             return phase.guid;
         }
- 
+
         internal string GetConfigListForTarget(string targetGuid)
         {
             if (targetGuid == project.project.guid)
@@ -1085,7 +1084,7 @@ namespace UnityEditor.iOS.Xcode
             return nativeTargets[targetGuid].buildConfigList;
         }
 
-        // Sets the baseConfigurationReference key for a XCBuildConfiguration. 
+        // Sets the baseConfigurationReference key for a XCBuildConfiguration.
         // If the argument is null, the base configuration is removed.
         internal void SetBaseReferenceForConfig(string configGuid, string baseReference)
         {
@@ -1094,7 +1093,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Adds a value to build property list in all build configurations for the specified target.
-        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and
         /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
@@ -1108,7 +1107,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Adds a value to build property list in all build configurations for the specified targets.
-        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and
         /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
         /// </summary>
         /// <param name="targetGuids">The GUIDs of the target as returned by [[TargetGuidByName()]].</param>
@@ -1122,7 +1121,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Adds a value to build property list of the given build configuration
-        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and
         /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
         /// </summary>
         /// <param name="configGuid">The GUID of the build configuration as returned by [[BuildConfigByName()]].</param>
@@ -1135,7 +1134,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Adds a value to build property list of the given build configurations
-        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and
         /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
         /// </summary>
         /// <param name="configGuids">The GUIDs of the build configurations as returned by [[BuildConfigByName()]].</param>
@@ -1149,7 +1148,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Adds a value to build property list in all build configurations for the specified target.
-        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and
         /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
@@ -1163,7 +1162,7 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Adds a value to build property list in all build configurations for the specified targets.
-        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and
         /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
         /// </summary>
         /// <param name="targetGuids">The GUIDs of the target as returned by [[TargetGuidByName()]].</param>
@@ -1226,19 +1225,19 @@ namespace UnityEditor.iOS.Xcode
 
         /// Interprets the value of the given property as a set of space-delimited strings, then
         /// removes strings equal to items to removeValues and adds strings in addValues.
-        public void UpdateBuildProperty(string targetGuid, string name, 
+        public void UpdateBuildProperty(string targetGuid, string name,
                                         IEnumerable<string> addValues, IEnumerable<string> removeValues)
         {
             foreach (string guid in buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs)
                 UpdateBuildPropertyForConfig(guid, name, addValues, removeValues);
         }
-        public void UpdateBuildProperty(IEnumerable<string> targetGuids, string name, 
+        public void UpdateBuildProperty(IEnumerable<string> targetGuids, string name,
                                         IEnumerable<string> addValues, IEnumerable<string> removeValues)
         {
             foreach (string t in targetGuids)
                 UpdateBuildProperty(t, name, addValues, removeValues);
         }
-        public void UpdateBuildPropertyForConfig(string configGuid, string name, 
+        public void UpdateBuildPropertyForConfig(string configGuid, string name,
                                                  IEnumerable<string> addValues, IEnumerable<string> removeValues)
         {
             var config = buildConfigs[configGuid];
@@ -1252,7 +1251,7 @@ namespace UnityEditor.iOS.Xcode
                         config.AddProperty(name, v);
             }
         }
-        public void UpdateBuildPropertyForConfig(IEnumerable<string> configGuids, string name, 
+        public void UpdateBuildPropertyForConfig(IEnumerable<string> configGuids, string name,
                                                  IEnumerable<string> addValues, IEnumerable<string> removeValues)
         {
             foreach (string guid in configGuids)
@@ -1360,7 +1359,7 @@ namespace UnityEditor.iOS.Xcode
             if (attributes.Contains("TargetAttributes"))
 			{
                 targetAttributes = attributes["TargetAttributes"] as PBXElementDict;
-            } 
+            }
 			else
 			{
                 targetAttributes = attributes.CreateDict("TargetAttributes");
@@ -1376,10 +1375,10 @@ namespace UnityEditor.iOS.Xcode
 				{
                     targetAttributesRaw = targetAttributes.CreateDict(target.Key);
                 }
-                targetAttributesRaw.SetString(key, value); 
+                targetAttributesRaw.SetString(key, value);
             }
             project.project.UpdateVars();
 
         }
     }
-} // namespace UnityEditor.iOS.Xcode
+} // namespace UnityModule.iOS.Xcode
