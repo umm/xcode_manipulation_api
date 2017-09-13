@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plist version="1.0">
+  <dict>
+    <key>aps-environment</key>
+    <string>development</string>
+  </dict>
+</plist>
