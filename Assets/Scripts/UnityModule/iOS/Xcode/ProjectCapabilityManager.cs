@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityModule.iOS.Xcode
 {
     // This class is here to help you add capabilities to your Xcode project.
     // Because capabilities modify the PBXProject, the entitlements file and/or the Info.plist and not consistently,

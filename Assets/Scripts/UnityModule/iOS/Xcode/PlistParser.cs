@@ -6,7 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityModule.iOS.Xcode
 {
 
     public class PlistElement
@@ -348,4 +348,4 @@ namespace UnityEditor.iOS.Xcode
         }
     }
 
-} // namespace UnityEditor.iOS.XCode
+} // namespace UnityModule.iOS.XCode

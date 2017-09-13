@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityModule.iOS.Xcode
 {
     internal class PBXPath
     {

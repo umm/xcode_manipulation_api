@@ -1,15 +1,15 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor.iOS.Xcode;
-using UnityEditor.iOS.Xcode.Extensions;
+using UnityModule.iOS.Xcode;
+using UnityModule.iOS.Xcode.Extensions;
 
-namespace UnityEditor.iOS.Xcode.Tests
+namespace UnityModule.iOS.Xcode.Tests
 {
     public class LinearGuidGenerator
     {
         private static int counter = 0;
-        
+
         public static void Reset()
         {
             counter = 0;
@@ -27,7 +27,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         in files -- one for source and and one for expected output data. The tests read a
         source file, write a modified version to a temporary test directory and compare to
         the expected output.
-        
+
         Since the changes between source and output files are quite small compared to the
         total quantity of data, it's best to use a diff tool when debugging failures or
         verifying changes.
@@ -38,10 +38,10 @@ namespace UnityEditor.iOS.Xcode.Tests
         public PBXProjectTests() : base("PBXProjectTestFiles", "PBXProjectTestOutput", false /*true for debug*/)
         {
         }
-        
+
         private static void ResetGuidGenerator()
         {
-            UnityEditor.iOS.Xcode.PBX.PBXGUID.SetGuidGenerator(LinearGuidGenerator.Generate);
+            UnityModule.iOS.Xcode.PBX.PBXGUID.SetGuidGenerator(LinearGuidGenerator.Generate);
             LinearGuidGenerator.Reset();
         }
 
@@ -61,7 +61,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             if (!DebugEnabled())
                 Directory.Delete(GetTestOutputPath(), recursive:true);
         }
-        
+
         private PBXProject ReadPBXProject()
         {
             return ReadPBXProject("base.pbxproj");
@@ -112,7 +112,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         public void BuildOptionsWork2()
         {
             ResetGuidGenerator();
-    
+
             PBXProject proj = ReadPBXProject();
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
 
@@ -122,7 +122,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             proj.AddBuildProperty(target, "TEST_ADD", "test3");
 
             // check SetBuildProperty when multiple values already exist
-            proj.AddBuildProperty(target, "TEST_SET", "test2");        
+            proj.AddBuildProperty(target, "TEST_SET", "test2");
             proj.AddBuildProperty(target, "TEST_SET", "test3");
             proj.SetBuildProperty(target, "TEST_SET", "test4");
 
@@ -148,7 +148,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             PBXProject proj = ReadPBXProject();
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
 
-            // check how various operations work for LIBRARY_SEARCH_PATHS as we have 
+            // check how various operations work for LIBRARY_SEARCH_PATHS as we have
             // special logic for this key
             proj.AddBuildProperty(target, "LIBRARY_SEARCH_PATHS", "test test");
             proj.AddBuildProperty(target, "LIBRARY_SEARCH_PATHS", "\"test test\"");
@@ -165,11 +165,11 @@ namespace UnityEditor.iOS.Xcode.Tests
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject("base_dup.pbxproj");
-            
+
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
             proj.UpdateBuildProperty(target, "TEST_DUP", new string[]{"test2"}, new string[]{"test3"});
             proj.UpdateBuildProperty(target, "TEST_DUP2", null, new string[]{"test_key"}); // duplicate value removal
-            
+
             TestOutput(proj, "dup1.pbxproj");
         }
 
@@ -291,12 +291,12 @@ namespace UnityEditor.iOS.Xcode.Tests
             // check if duplicate add is ignored (we don't lose flags)
             proj.AddFileToBuildWithFlags(target, proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source),
                                          "-Wno-newline");
-            
+
             // check if we can add flags to an existing file and remove them
             proj.AddFileToBuild(target, proj.AddFile("relative/path2.cc", "Classes/path2.cc", PBXSourceTree.Source));
-            proj.AddFileToBuildWithFlags(target, proj.AddFile("relative/path3.cc", "Classes/path3.cc", PBXSourceTree.Source), 
+            proj.AddFileToBuildWithFlags(target, proj.AddFile("relative/path3.cc", "Classes/path3.cc", PBXSourceTree.Source),
                                          "-Wno-newline");
-            
+
             proj = Reserialize(proj);
             target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
             proj.SetCompileFlagsForFile(target, proj.FindFileGuidByProjectPath("Classes/path2.cc"),
@@ -347,12 +347,12 @@ namespace UnityEditor.iOS.Xcode.Tests
             Assert.IsTrue(proj.ContainsFramework(targetGuid, "GameCenter.framework"));
             Assert.IsTrue(proj.ContainsFramework(target2Guid, "GameCenter.framework"));
             proj = Reserialize(proj);
- 
+
             proj.RemoveFrameworkFromProject(targetGuid, "GameCenter.framework");
             Assert.IsFalse(proj.ContainsFramework(targetGuid, "GameCenter.framework"));
             Assert.IsTrue(proj.ContainsFramework(target2Guid, "GameCenter.framework"));
             proj = Reserialize(proj);
- 
+
             proj.RemoveFrameworkFromProject(target2Guid, "GameCenter.framework");
             Assert.IsFalse(proj.ContainsFramework(targetGuid, "GameCenter.framework"));
             Assert.IsFalse(proj.ContainsFramework(target2Guid, "GameCenter.framework"));
@@ -456,14 +456,14 @@ namespace UnityEditor.iOS.Xcode.Tests
         {
             PBXProject proj;
             string target;
-            
+
             ResetGuidGenerator();
             proj = ReadPBXProject();
             target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
             proj.AddExternalProjectDependency("UnityDevProject/UnityDevProject.xcodeproj", "UnityDevProject.xcodeproj",
                                               PBXSourceTree.Source);
             TestOutput(proj, "add_external_ref1.pbxproj");
-            
+
             ResetGuidGenerator();
             proj = ReadPBXProject();
             target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
@@ -481,7 +481,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         {
             PBXProject proj;
             string target;
-            
+
             ResetGuidGenerator();
             proj = ReadPBXProject();
             target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
@@ -534,7 +534,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             proj.AddBuildConfig("Existing");
             Assert.Throws<System.Exception>(() => proj.AddBuildConfig("Existing"));
         }
- 
+
         [Test]
         public void RemoveBuildConfigWorks()
         {
@@ -637,14 +637,14 @@ namespace UnityEditor.iOS.Xcode.Tests
             PBXProject proj = ReadPBXProject("base_stripped.pbxproj");
             TestOutput(proj, "stripped1.pbxproj");
         }
-        
+
         [Test]
         public void UnknownFileTypesWork()
         {
             PBXProject proj = ReadPBXProject("base_unknown.pbxproj");
             TestOutput(proj, "unknown1.pbxproj");
         }
-        
+
         [Test]
         public void InvalidProjectRepairWorks()
         {

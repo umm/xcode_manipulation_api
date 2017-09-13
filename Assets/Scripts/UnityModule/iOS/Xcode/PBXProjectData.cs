@@ -3,9 +3,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System;
-using UnityEditor.iOS.Xcode.PBX;
+using UnityModule.iOS.Xcode.PBX;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityModule.iOS.Xcode
 {
     using PBXBuildFileSection           = KnownSectionBase<PBXBuildFileData>;
     using PBXFileReferenceSection       = KnownSectionBase<PBXFileReferenceData>;
@@ -694,5 +694,5 @@ namespace UnityEditor.iOS.Xcode
         }
     }
 
-} // namespace UnityEditor.iOS.Xcode
+} // namespace UnityModule.iOS.Xcode
 

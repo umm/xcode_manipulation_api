@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityModule.iOS.Xcode
 {
     internal class JsonElement
     {
@@ -254,4 +254,4 @@ namespace UnityEditor.iOS.Xcode
     }
 
 
-} // namespace UnityEditor.iOS.Xcode
+} // namespace UnityModule.iOS.Xcode

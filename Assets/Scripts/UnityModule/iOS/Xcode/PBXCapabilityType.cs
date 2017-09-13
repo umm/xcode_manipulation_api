@@ -1,4 +1,4 @@
-﻿namespace UnityEditor.iOS.Xcode
+﻿namespace UnityModule.iOS.Xcode
 {
     /// <summary>
     /// List of all the capabilities available.
