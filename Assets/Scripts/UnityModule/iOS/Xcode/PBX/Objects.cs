@@ -871,6 +871,7 @@ namespace UnityModule.iOS.Xcode.PBX
         public string mainGroup { get { return GetPropertyString("mainGroup"); } }
         public List<string> targets = new List<string>();
         public List<string> knownAssetTags = new List<string>();
+        public List<string> knownRegions = new List<string>();
         public string buildConfigList;
         // the name of the entitlements file required for some capabilities.
         public string entitlementsFile;
@@ -897,6 +898,7 @@ namespace UnityModule.iOS.Xcode.PBX
                 }
             };
             SetPropertyList("targets", targets);
+            SetPropertyList("knownRegions", knownRegions);
             SetPropertyString("buildConfigurationList", buildConfigList);
             if (knownAssetTags.Count > 0)
             {
@@ -951,6 +953,7 @@ namespace UnityModule.iOS.Xcode.PBX
                 }
             }
             targets = GetPropertyList("targets");
+            knownRegions = GetPropertyList("knownRegions");
             buildConfigList = GetPropertyString("buildConfigurationList");
 
             // update knownAssetTags

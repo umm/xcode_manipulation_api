@@ -1380,5 +1380,13 @@ namespace UnityModule.iOS.Xcode
             project.project.UpdateVars();
 
         }
+
+        public void KnownRegionAdd(string knownRegion) {
+            project.project.knownRegions.Add(knownRegion);
+        }
+
+        public void KnownRegionRemove(string knownRegion) {
+            project.project.knownRegions.Remove(knownRegion);
+        }
     }
 } // namespace UnityModule.iOS.Xcode
