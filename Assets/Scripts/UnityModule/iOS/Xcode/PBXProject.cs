@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityModule.iOS.Xcode.PBX;
@@ -60,6 +60,7 @@ namespace UnityModule.iOS.Xcode
         internal PBXBuildFileData BuildFilesGetForSourceFile(string targetGuid, string fileGuid) { return m_Data.BuildFilesGetForSourceFile(targetGuid, fileGuid); }
         internal IEnumerable<PBXBuildFileData> BuildFilesGetAll() { return m_Data.BuildFilesGetAll(); }
         internal void FileRefsAdd(string realPath, string projectPath, PBXGroupData parent, PBXFileReferenceData fileRef) { m_Data.FileRefsAdd(realPath, projectPath, parent, fileRef); }
+        internal void FileRefsAdd(string realPath, string projectPath, PBXVariantGroupData parent, PBXFileReferenceData fileRef) { m_Data.FileRefsAdd(realPath, projectPath, parent, fileRef); }
         internal PBXFileReferenceData FileRefsGet(string guid) { return m_Data.FileRefsGet(guid); }
         internal PBXFileReferenceData FileRefsGetByRealPath(string path, PBXSourceTree sourceTree) { return m_Data.FileRefsGetByRealPath(path, sourceTree); }
         internal PBXFileReferenceData FileRefsGetByProjectPath(string path) { return m_Data.FileRefsGetByProjectPath(path); }
@@ -71,6 +72,12 @@ namespace UnityModule.iOS.Xcode
         internal void GroupsAdd(string projectPath, PBXGroupData parent, PBXGroupData gr) { m_Data.GroupsAdd(projectPath, parent, gr); }
         internal void GroupsAddDuplicate(PBXGroupData gr) { m_Data.GroupsAddDuplicate(gr); }
         internal void GroupsRemove(string guid) { m_Data.GroupsRemove(guid); }
+        internal PBXVariantGroupData VariantGroupsGet(string guid) { return m_Data.VariantGroupsGet(guid); }
+        internal PBXVariantGroupData VariantGroupsGetByChild(string childGuid) { return m_Data.VariantGroupsGetByChild(childGuid); }
+        internal PBXVariantGroupData VariantGroupsGetByProjectPath(string sourceGroup) { return m_Data.VariantGroupsGetByProjectPath(sourceGroup); }
+        internal void VariantGroupsAdd(string projectPath, PBXGroupData parent, PBXVariantGroupData gr) { m_Data.VariantGroupsAdd(projectPath, parent, gr); }
+        internal void VariantGroupsAddDuplicate(PBXVariantGroupData gr) { m_Data.VariantGroupsAddDuplicate(gr); }
+        internal void VariantGroupsRemove(string guid) { m_Data.VariantGroupsRemove(guid); }
         internal FileGUIDListBase BuildSectionAny(PBXNativeTargetData target, string path, bool isFolderRef) { return m_Data.BuildSectionAny(target, path, isFolderRef); }
         internal FileGUIDListBase BuildSectionAny(string sectionGuid) { return m_Data.BuildSectionAny(sectionGuid); }
 
@@ -213,6 +220,42 @@ namespace UnityModule.iOS.Xcode
             if (sourceTree == PBXSourceTree.Group)
                 throw new Exception("sourceTree must not be PBXSourceTree.Group");
             return AddFileImpl(path, projectPath, sourceTree, true);
+        }
+
+        public string AddLocalizedFile(string path, string language) {
+            path = PBXPath.FixSlashes(path);
+
+            string sourceProjectPath = PBXPath.GetDirectory(PBXPath.GetDirectory(path));
+            string projectPathForVariantGroup = PBXPath.Combine(sourceProjectPath, PBXPath.GetFilename(path));
+            string projectPathForFileReference = PBXPath.Combine(PBXPath.GetFilename(PBXPath.GetDirectory(path)), PBXPath.GetFilename(path));
+
+            PBXGroupData parent = GroupsGetByProjectPath(sourceProjectPath);
+            if (parent == null) {
+                parent = CreateSourceGroup(PBXPath.GetDirectory(PBXPath.GetDirectory(path)));
+            }
+
+            PBXVariantGroupData variantGroupData = VariantGroupsGetByProjectPath(projectPathForVariantGroup);
+            if (variantGroupData == null) {
+                variantGroupData = PBXVariantGroupData.Create(PBXPath.GetFilename(path));
+                parent.children.AddGUID(variantGroupData.guid);
+                VariantGroupsAdd(projectPathForVariantGroup, parent, variantGroupData);
+                PBXBuildFileData buildFileData = PBXBuildFileData.CreateFromFile(variantGroupData.guid, false, null);
+                string targetGUID = TargetGuidByName(PBXProject.GetUnityTargetName());
+                BuildFilesAdd(targetGUID, buildFileData);
+                BuildSectionAny(nativeTargets[targetGUID], Path.GetExtension(path), false).files.AddGUID(buildFileData.guid);
+            }
+
+            PBXFileReferenceData fileReferenceData = FileRefsGetByProjectPath(projectPathForFileReference);
+            if (fileReferenceData == null) {
+                fileReferenceData = PBXFileReferenceData.CreateFromFile(projectPathForFileReference, language, PBXSourceTree.Group);
+                fileReferenceData.UpdateProps();
+                fileReferenceData.SetFileTypeByExtension(Path.GetExtension(path));
+                fileReferenceData.UpdateVars();
+                variantGroupData.children.AddGUID(fileReferenceData.guid);
+                FileRefsAdd(path, projectPathForFileReference, variantGroupData, fileReferenceData);
+            }
+
+            return fileReferenceData.guid;
         }
 
         private void AddBuildFileImpl(string targetGuid, string fileGuid, bool weak, string compileFlags)
@@ -1383,10 +1426,17 @@ namespace UnityModule.iOS.Xcode
 
         public void KnownRegionAdd(string knownRegion) {
             project.project.knownRegions.Add(knownRegion);
+            project.project.UpdateProps();
         }
 
         public void KnownRegionRemove(string knownRegion) {
             project.project.knownRegions.Remove(knownRegion);
+            project.project.UpdateProps();
+        }
+
+        public void KnownRegionClear() {
+            project.project.knownRegions.Clear();
+            project.project.UpdateProps();
         }
     }
 } // namespace UnityModule.iOS.Xcode

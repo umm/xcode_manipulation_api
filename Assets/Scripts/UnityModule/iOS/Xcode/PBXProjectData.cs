@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -59,8 +59,11 @@ namespace UnityModule.iOS.Xcode
         private Dictionary<string, string> m_FileRefGuidToProjectPathMap = null;
         private Dictionary<PBXSourceTree, Dictionary<string, PBXFileReferenceData>> m_RealPathToFileRefMap = null;
         private Dictionary<string, PBXGroupData> m_ProjectPathToGroupMap = null;
+        private Dictionary<string, PBXVariantGroupData> m_ProjectPathToVariantGroupMap = null;
         private Dictionary<string, string> m_GroupGuidToProjectPathMap = null;
+        private Dictionary<string, string> m_VariantGroupGuidToProjectPathMap = null;
         private Dictionary<string, PBXGroupData> m_GuidToParentGroupMap = null;
+        private Dictionary<string, PBXVariantGroupData> m_GuidToParentVariantGroupMap = null;
 
         public PBXBuildFileData BuildFilesGet(string guid)
         {
@@ -94,9 +97,9 @@ namespace UnityModule.iOS.Xcode
                 return null;
             return m_FileGuidToBuildFileMap[targetGuid][fileGuid];
         }
-        
-        public IEnumerable<PBXBuildFileData> BuildFilesGetAll() 
-        { 
+
+        public IEnumerable<PBXBuildFileData> BuildFilesGetAll()
+        {
             return buildFiles.GetObjects();
         }
 
@@ -105,8 +108,23 @@ namespace UnityModule.iOS.Xcode
             fileRefs.AddEntry(fileRef);
             m_ProjectPathToFileRefMap.Add(projectPath, fileRef);
             m_FileRefGuidToProjectPathMap.Add(fileRef.guid, projectPath);
-            m_RealPathToFileRefMap[fileRef.tree].Add(realPath, fileRef); // FIXME
+            if (!m_RealPathToFileRefMap.ContainsKey(fileRef.tree)) {
+                m_RealPathToFileRefMap[fileRef.tree] = new Dictionary<string, PBXFileReferenceData>();
+            }
+            m_RealPathToFileRefMap[fileRef.tree].Add(realPath, fileRef);
             m_GuidToParentGroupMap.Add(fileRef.guid, parent);
+        }
+
+        public void FileRefsAdd(string realPath, string projectPath, PBXVariantGroupData parent, PBXFileReferenceData fileRef)
+        {
+            fileRefs.AddEntry(fileRef);
+            m_ProjectPathToFileRefMap.Add(projectPath, fileRef);
+            m_FileRefGuidToProjectPathMap.Add(fileRef.guid, projectPath);
+            if (!m_RealPathToFileRefMap.ContainsKey(fileRef.tree)) {
+                m_RealPathToFileRefMap[fileRef.tree] = new Dictionary<string, PBXFileReferenceData>();
+            }
+            m_RealPathToFileRefMap[fileRef.tree].Add(realPath, fileRef);
+            m_GuidToParentVariantGroupMap.Add(fileRef.guid, parent);
         }
 
         public PBXFileReferenceData FileRefsGet(string guid)
@@ -137,6 +155,7 @@ namespace UnityModule.iOS.Xcode
             foreach (var tree in FileTypeUtils.AllAbsoluteSourceTrees())
                 m_RealPathToFileRefMap[tree].Remove(fileRef.path);
             m_GuidToParentGroupMap.Remove(guid);
+            m_GuidToParentVariantGroupMap.Remove(guid);
         }
 
         public PBXGroupData GroupsGet(string guid)
@@ -182,6 +201,46 @@ namespace UnityModule.iOS.Xcode
             m_GroupGuidToProjectPathMap.Remove(guid);
             m_GuidToParentGroupMap.Remove(guid);
             groups.RemoveEntry(guid);
+        }
+
+        public PBXVariantGroupData VariantGroupsGet(string guid)
+        {
+            return variantGroups[guid];
+        }
+
+        public PBXVariantGroupData VariantGroupsGetByChild(string childGuid)
+        {
+            return m_GuidToParentVariantGroupMap[childGuid];
+        }
+
+        /// Returns the source group identified by sourceGroup. If sourceGroup is empty or null,
+        /// root group is returned. If no group is found, null is returned.
+        public PBXVariantGroupData VariantGroupsGetByProjectPath(string sourceGroup)
+        {
+            if (m_ProjectPathToVariantGroupMap.ContainsKey(sourceGroup))
+                return m_ProjectPathToVariantGroupMap[sourceGroup];
+            return null;
+        }
+
+        public void VariantGroupsAdd(string projectPath, PBXGroupData parent, PBXVariantGroupData gr)
+        {
+            m_ProjectPathToVariantGroupMap.Add(projectPath, gr);
+            m_VariantGroupGuidToProjectPathMap.Add(gr.guid, projectPath);
+            m_GuidToParentGroupMap.Add(gr.guid, parent);
+            variantGroups.AddEntry(gr);
+        }
+
+        public void VariantGroupsAddDuplicate(PBXVariantGroupData gr)
+        {
+            variantGroups.AddEntry(gr);
+        }
+
+        public void VariantGroupsRemove(string guid)
+        {
+            m_ProjectPathToVariantGroupMap.Remove(m_VariantGroupGuidToProjectPathMap[guid]);
+            m_VariantGroupGuidToProjectPathMap.Remove(guid);
+            m_GuidToParentGroupMap.Remove(guid);
+            variantGroups.RemoveEntry(guid);
         }
 
         public FileGUIDListBase BuildSectionAny(PBXNativeTargetData target, string path, bool isFolderRef)
@@ -295,6 +354,65 @@ namespace UnityModule.iOS.Xcode
             }
         }
 
+        void RefreshMapsForVariantGroupChildren(string projectPath, string realPath, PBXSourceTree realPathTree, PBXVariantGroupData parent)
+        {
+            var children = new List<string>(parent.children);
+            foreach (string guid in children)
+            {
+                PBXFileReferenceData fileRef = fileRefs[guid];
+                string pPath;
+                string rPath;
+                PBXSourceTree rTree;
+
+                if (fileRef != null)
+                {
+                    pPath = PBXPath.Combine(projectPath, fileRef.name);
+                    PBXPath.Combine(realPath, realPathTree, fileRef.path, fileRef.tree, out rPath, out rTree);
+
+                    if (!m_ProjectPathToFileRefMap.ContainsKey(pPath))
+                    {
+                        m_ProjectPathToFileRefMap.Add(pPath, fileRef);
+                    }
+                    if (!m_FileRefGuidToProjectPathMap.ContainsKey(fileRef.guid))
+                    {
+                        m_FileRefGuidToProjectPathMap.Add(fileRef.guid, pPath);
+                    }
+                    if (!m_RealPathToFileRefMap[rTree].ContainsKey(rPath))
+                    {
+                        m_RealPathToFileRefMap[rTree].Add(rPath, fileRef);
+                    }
+                    if (!m_GuidToParentVariantGroupMap.ContainsKey(guid))
+                    {
+                        m_GuidToParentVariantGroupMap.Add(guid, parent);
+                    }
+
+                    continue;
+                }
+
+                PBXVariantGroupData gr = variantGroups[guid];
+                if (gr != null)
+                {
+                    pPath = PBXPath.Combine(projectPath, gr.name);
+                    PBXPath.Combine(realPath, realPathTree, gr.path, gr.tree, out rPath, out rTree);
+
+                    if (!m_ProjectPathToVariantGroupMap.ContainsKey(pPath))
+                    {
+                        m_ProjectPathToVariantGroupMap.Add(pPath, gr);
+                    }
+                    if (!m_VariantGroupGuidToProjectPathMap.ContainsKey(gr.guid))
+                    {
+                        m_VariantGroupGuidToProjectPathMap.Add(gr.guid, pPath);
+                    }
+                    if (!m_GuidToParentVariantGroupMap.ContainsKey(guid))
+                    {
+                        m_GuidToParentVariantGroupMap.Add(guid, parent);
+                    }
+
+                    RefreshMapsForVariantGroupChildren(pPath, rPath, rTree, gr);
+                }
+            }
+        }
+
         void RefreshAuxMaps()
         {
             foreach (var targetEntry in nativeTargets.GetEntries())
@@ -372,8 +490,11 @@ namespace UnityModule.iOS.Xcode
             foreach (var tree in FileTypeUtils.AllAbsoluteSourceTrees())
                 m_RealPathToFileRefMap.Add(tree, new Dictionary<string, PBXFileReferenceData>());
             m_ProjectPathToGroupMap = new Dictionary<string, PBXGroupData>();
+            m_ProjectPathToVariantGroupMap = new Dictionary<string, PBXVariantGroupData>();
             m_GroupGuidToProjectPathMap = new Dictionary<string, string>();
+            m_VariantGroupGuidToProjectPathMap = new Dictionary<string, string>();
             m_GuidToParentGroupMap = new Dictionary<string, PBXGroupData>();
+            m_GuidToParentVariantGroupMap = new Dictionary<string, PBXVariantGroupData>();
         }
 
         private void BuildCommentMapForBuildFiles(GUIDToCommentMap comments, List<string> guids, string sectName)
