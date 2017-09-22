@@ -258,6 +258,22 @@ namespace UnityModule.iOS.Xcode
             return fileReferenceData.guid;
         }
 
+        public string AddEntitlementFile(string path) {
+            path = PBXPath.FixSlashes(path);
+
+            PBXFileReferenceData fileReferenceData = FileRefsGetByProjectPath(path);
+            if (fileReferenceData == null) {
+                fileReferenceData = PBXFileReferenceData.CreateFromFile(path, PBXPath.GetFilename(path), PBXSourceTree.Group);
+                fileReferenceData.UpdateProps();
+                fileReferenceData.SetFileTypeByExtension(Path.GetExtension(path));
+                fileReferenceData.UpdateVars();
+                GroupsGetMainGroup().children.AddGUID(fileReferenceData.guid);
+                FileRefsAdd(path, path, GroupsGetMainGroup(), fileReferenceData);
+            }
+
+            return fileReferenceData.guid;
+        }
+
         private void AddBuildFileImpl(string targetGuid, string fileGuid, bool weak, string compileFlags)
         {
             PBXNativeTargetData target = nativeTargets[targetGuid];
