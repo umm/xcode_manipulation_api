@@ -1,6 +1,6 @@
 {
   "name": "@umm/xcode_manipulation_api",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Xcode Manipulation API for Unity",
   "homepage": "https://bitbucket.org/Unity-Technologies/xcodeapi",
   "bugs": {
